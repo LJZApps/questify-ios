@@ -1,76 +1,85 @@
 import SwiftUI
 
-enum ViewSelection: Hashable {
-    case dashboard, yourQuests, settings
+enum AppScreen: Hashable {
+    case yourQuests
+    case settings
 }
 
-struct HomeView: View {
-    @State private var selection: ViewSelection? = nil
-    @State private var hasAppeared = false
+struct HomeScene: Scene {
+    @State private var selection: AppScreen? = .yourQuests
+    
+    @State private var detailPath = NavigationPath()
+    
+    @State private var searchText = ""
 
-    var body: some View {
-        NavigationStack {
-            List {
-                Section(header: Text("Missionen")) {
-                    NavigationLink(tag: ViewSelection.yourQuests, selection: $selection) {
-                        YourQuestsView()
-                    } label: {
-                        Label("Quests", systemImage: "list.bullet")
+    var body: some Scene {
+        WindowGroup {
+            NavigationSplitView {
+                List(selection: $selection) {
+                    Section(header: Text("Missionen")) {
+                        NavigationLink(value: AppScreen.yourQuests) {
+                            Label("Quests", systemImage: "list.bullet")
+                        }
+                        
+                        NavigationLink(value: AppScreen.settings) {
+                            Label("Gewohnheiten", systemImage: "leaf")
+                        }
                     }
                     
-                    NavigationLink(tag: ViewSelection.yourQuests, selection: $selection) {
-                        YourQuestsView()
-                    } label: {
-                        Label("Gewohnheiten", systemImage: "leaf")
+                    Section(header: Text("Erfolge")) {
+                        NavigationLink(value: AppScreen.settings) {
+                            Label("Werte", systemImage: "chart.bar.xaxis")
+                        }
                     }
                 }
-                
-                Section(header: Text("Erfolge")) {
-                    NavigationLink(tag: ViewSelection.yourQuests, selection: $selection) {
-                        YourQuestsView()
-                    } label: {
-                        Label("Werte", systemImage: "chart.bar.xaxis")
+                .frame(minWidth: 200)
+                .listStyle(.sidebar)
+                .tint(.secondary)
+            } detail: {
+                NavigationStack(path: $detailPath) {
+                    Group {
+                        switch selection {
+                        case .yourQuests:
+                            YourQuestsView()
+                        case .settings:
+                            Text("Hier kommen die Einstellungen")
+                        case .none:
+                            Text("Wähle deine Mission aus der Sidebar.")
+                        }
+                    }
+                    .toolbar {
+                        ToolbarItem {
+                            Button(action: {}) {
+                                Image(systemName: "gear")
+                            }
+                        }
                     }
                 }
             }
-            .navigationTitle("Questify")
-            .toolbar {
-                ToolbarItem {
-                    Button(action: {}) {
-                        Image(systemName: "gear")
-                    }
+            .navigationSplitViewStyle(.automatic)
+            .searchable(text: $searchText, placement: .toolbar, prompt: "Quests suchen")
+            
+            .onAppear {
+                if selection == nil {
+                    selection = .yourQuests
                 }
             }
         }
-    }
-}
-
-struct DashboardView: View {
-    var body: some View {
-        Text("Hier kommt das Dashboard")
-            .navigationTitle("Dashbaord")
-    }
+        }
 }
 
 struct YourQuestsView: View {
-    
-    @State private var searchText = ""
-    
     var body: some View {
-        VStack {
-            List {
-                
-            }
-            .searchable(text: $searchText, prompt: "Quests suchen")
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                        Text("Your Quests")
-                            .font(.headline)
-                    }
-                ToolbarItem {
-                    Button(action: {}) {
-                        Image(systemName: "plus")
-                    }
+        List {
+            Text("Noch keine Quests erstellt. Zeit, deine erste Mission zu erstellen!")
+                .foregroundColor(.secondary)
+        }
+        //.listStyle(.insetGrouped)
+        .navigationTitle("Your Quests")
+        .toolbar {
+            ToolbarItem {
+                Button(action: {}) {
+                    Image(systemName: "plus")
                 }
             }
         }

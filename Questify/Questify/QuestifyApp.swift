@@ -26,13 +26,18 @@ struct QuestifyApp: App {
     }()
 
     var body: some Scene {
-        WindowGroup {
-            if (!viewModel.isSetupDone) {
-                HomeView()
-            } else {
-                GetStartedMainView()
-            }
+        #if os(iOS)
+        if (!viewModel.isSetupDone) {
+            HomeScene()
+        } else {
+            GetStartedMainView()
         }
         .modelContainer(sharedModelContainer)
+        
+        #elseif os(macOS)
+        Settings {
+            
+        }
+        #endif
     }
 }
