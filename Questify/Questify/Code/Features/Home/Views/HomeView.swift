@@ -1,27 +1,35 @@
 import SwiftUI
 
 enum ViewSelection: Hashable {
-    case dashboard, yourQuests
+    case dashboard, yourQuests, settings
 }
 
 struct HomeView: View {
-    @State private var selection: ViewSelection? = nil // Beginnt als nil
-    @State private var hasAppeared = false // Überprüft, ob die Ansicht zum ersten Mal geladen wird
+    @State private var selection: ViewSelection? = nil
+    @State private var hasAppeared = false
 
     var body: some View {
         NavigationStack {
             List {
-                NavigationLink(tag: ViewSelection.dashboard, selection: $selection) {
-                    DashboardView()
-                } label: {
-                    Label("Dashboard", systemImage: "house")
-                }
-                
-                Section(header: Text("Quests")) {
+                Section(header: Text("Missionen")) {
                     NavigationLink(tag: ViewSelection.yourQuests, selection: $selection) {
                         YourQuestsView()
                     } label: {
-                        Label("Your Quests", systemImage: "list.bullet")
+                        Label("Quests", systemImage: "list.bullet")
+                    }
+                    
+                    NavigationLink(tag: ViewSelection.yourQuests, selection: $selection) {
+                        YourQuestsView()
+                    } label: {
+                        Label("Gewohnheiten", systemImage: "leaf")
+                    }
+                }
+                
+                Section(header: Text("Erfolge")) {
+                    NavigationLink(tag: ViewSelection.yourQuests, selection: $selection) {
+                        YourQuestsView()
+                    } label: {
+                        Label("Werte", systemImage: "chart.bar.xaxis")
                     }
                 }
             }
@@ -31,12 +39,6 @@ struct HomeView: View {
                     Button(action: {}) {
                         Image(systemName: "gear")
                     }
-                }
-            }
-            .onAppear {
-                if !hasAppeared {
-                    selection = .dashboard // Setzt Dashboard als Startansicht beim ersten Erscheinen
-                    hasAppeared = true // Setzt den Status auf wahr, um erneutes Setzen zu verhindern
                 }
             }
         }
@@ -51,33 +53,15 @@ struct DashboardView: View {
 }
 
 struct YourQuestsView: View {
+    
+    @State private var searchText = ""
+    
     var body: some View {
         VStack {
-            TabView {
-                Text("Quests")
-                    .tabItem {
-                        Image(systemName: "list.bullet")
-                        Text("Quests")
-                    }
+            List {
                 
-                Text("Dailies")
-                    .tabItem {
-                        Image(systemName: "calendar")
-                        Text("Dailies")
-                    }
-                
-                Text("Routines")
-                    .tabItem {
-                        Image(systemName: "clock")
-                        Text("Routines")
-                    }
-                
-                Text("Rituals")
-                    .tabItem {
-                        Image(systemName: "leaf")
-                        Text("Rituals")
-                    }
             }
+            .searchable(text: $searchText, prompt: "Quests suchen")
             .toolbar {
                 ToolbarItem(placement: .principal) {
                         Text("Your Quests")
